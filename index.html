@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<title>贪吃蛇游戏</title>	<style>
+
+		body {
+
+			margin: 0;
+
+			padding: 0;
+
+		}
+
+		
+
+		canvas {
+
+			display: block;
+
+			position: absolute;
+
+			top: 50%;
+
+			left: 50%;
+
+			transform: translate(-50%, -50%);
+
+			border: 1px solid black;
+
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+	<canvas id="canvas"></canvas>
+
+	<script>
+
+		// 获取画布和上下文
+
+		var canvas = document.getElementById("canvas");
+
+		var ctx = canvas.getContext("2d");
+
+		
+
+		// 定义游戏板块的大小和格子的大小
+
+		var canvasWidth = 400;
+
+		var canvasHeight = 400;
+
+		var gridSize = 10;
+
+		
+
+		// 定义蛇和食物的初始位置
+
+		var snake = [{x: 200, y: 200}];
+
+		var food = {x: 0, y: 0};
+
+		
+
+		// 随机生成食物的位置
+
+		function generateFood() {
+
+			food.x = Math.floor(Math.random() * (canvasWidth / gridSize)) * gridSize;
+
+			food.y = Math.floor(Math.random() * (canvasHeight / gridSize)) * gridSize;
+
+		}
+
+		
+
+		// 初始化游戏
+
+		function init() {
+
+			// 设置画布的大小
+
+			canvas.width = canvasWidth;
+
+			canvas.height = canvasHeight;
+
+			
+
+			// 随机生成食物的位置
+
+			generateFood();
+
+			
+
+			// 监听键盘事件
+
+			document.addEventListener("keydown", function(event) {
+
+				var keyCode = event.keyCode;
+
+				if (keyCode == 37 && direction != "right") {
+
+					direction = "left";
+
+				} else if (keyCode == 38 && direction != "down") {
+
+					direction = "up";
+
+				} else if (keyCode == 39 && direction != "left") {
+
+					direction = "right";
+
+				} else if (keyCode == 40 && direction != "up") {
+
+					direction = "down";
+
+				}
+
+			});
+
+			
+
+			// 监听触摸事件
+
+			canvas.addEventListener("touchstart", function(event) {
+
+				event.preventDefault();
+
+				var touch = event.touches[0];
+
+				startX = touch.pageX;
+
+				startY = touch.pageY;
+
+			});
+
+			
+
+			canvas.addEventListener("touchmove", function(event) {
+
+				event.preventDefault();
+
+				var touch = event.touches[0];
+
+				var deltaX = touch.pageX - startX;
+
+				var deltaY = touch.pageY - startY;
+
+				if (Math.abs(deltaX) > Math.abs(deltaY)) {
+
+					if (deltaX > 0 && direction != "left") {
+
+						direction = "right";
+
+					} else if (deltaX < 0 && direction != "right") {
+
+						direction = "left";
+
+					}
+
+				} else {
+
+					if (deltaY > 0 && direction != "up") {
+
+						direction = "down";
+
+					} else if (deltaY < 0 && direction != "down") {
+
+						direction = "up";
+
+					}
+
+				}
+
+			});
+
+			
+
+			// 开始游戏循环
+
+			gameLoop();
+
+		}
+
+		
+
+		// 定义蛇的移动方向
+
+		var direction = "right";
+
+		
+
+		// 游戏循环
+
+		function gameLoop() {
+
+			// 移动蛇的位置
+
+			var head = {x: snake[0].x, y: snake[0].y};
+
+			if (direction == "right") {
+
+				head.x += gridSize;
+
+			} else if (direction == "left") {
+
+				head.x -= gridSize;
+
+			} else if (direction == "up") {
+
+				head.y -= gridSize;
+
+			} else if (direction == "down") {
+
+				head.y += gridSize;
+
+			}
+
+			
+
+			// 判断蛇是否吃到了食物
+
+			if (head.x == food.x && head.y == food.y) {
+
+				snake.unshift(head);
+
+				generateFood();
+
+			} else {
+
+				snake.pop();
+
+				snake.unshift(head);
+
+			}
+
+			
+
+			// 绘制游戏板块
+
+			ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+			ctx.fillStyle = "black";
+
+			for (var i = 0; i < snake.length; i++) {
+
+				ctx.fillRect(snake[i].x, snake[i].y, gridSize, gridSize);
+
+			}
+
+			ctx.fillStyle = "red";
+
+			ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+			
+
+			// 判断游戏是否结束
+
+			if (snake[0].x < 0 || snake[0].x >= canvasWidth || snake[0].y < 0 || snake[0].y >= canvasHeight) {
+
+				alert("游戏结束！");
+
+				location.reload();
+
+			} else {
+
+				for (var i = 1; i < snake.length; i++) {
+
+					if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
+
+						alert("游戏结束！");
+
+						location.reload();
+
+					}
+
+				}
+
+			}
+
+			
+
+			// 设置游戏速度
+
+			setTimeout(gameLoop, 100);
+
+		}
+
+		
+
+		// 初始化游戏
+
+		init();
+
+	</script>
+
+</body>
+
+</html>
